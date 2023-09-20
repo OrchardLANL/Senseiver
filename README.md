@@ -1,5 +1,8 @@
 # The Senseiver
 
+[![DOI](https://zenodo.org/badge/694242193.svg)](https://zenodo.org/badge/latestdoi/694242193)
+
+
 
 Implementation of *"The Senseiver: attention-based global field reconstruction from sparse observations"* in Pytorch. This model provides an easy and efficient way to train a data driven to create a mapping between sensor measurements an a global field, the model operations are decoupled from the size of the domain which allows the model to be trained with very large n-D arrays. The application shown in our paper considered simulations, but the method is general, and should be applicable to any other application.
 
