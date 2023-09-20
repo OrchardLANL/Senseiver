@@ -65,7 +65,6 @@ Load a model to test or to re-train on. Our library saves the models sequenciall
 To test the model in the entire dataset.
 
 
-### Additional notes
 
 ## Usage
 
