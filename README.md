@@ -89,5 +89,24 @@ done
 <img src="results.png" width="500px"></img>
 </p>
 
+
+## Code acknowledgements
+
+We are grateful to the developers of the many software packages used throughout this project including, but not limited, to PyTorch, Numpy, Vedo, Matplotlib, PyTorch Lightning, and [krasserm's](https://github.com/krasserm/perceiver-io) implementation of the perceiver models.
+
+## Citation
+If you use our code for your own research, we would be grateful if you cite our publication
+[NMI](https://www.nature.com/articles/s42256-023-00746-x)
+```
+@article{Senseiver,
+title = "Development of the Senseiver for efficient field reconstruction from sparse observations",
+journal = "Nat Mach Intell",
+year = "2023",
+doi = "url = "https://link.springer.com/article/10.1007/s11242-021-01617-y",
+url = "https://www.nature.com/articles/s42256-023-00746-x"
+}
+```
+
+
 ## Data availability
 The data is available at [10.5281/zenodo.8290039](https://zenodo.org/record/8290040).
