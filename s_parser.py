@@ -32,7 +32,7 @@ def parse_args():
     parser.add_argument("--batch_frames", default=64, type=int)
     parser.add_argument("--batch_pixels", default=2048, type=int)
     parser.add_argument("--lr", default=0.0001, type=float)
-    parser.add_argument("--accum_grads", default=None, type=int)
+    parser.add_argument("--accum_grads", default=1, type=int)
     
     # Positional Encodings
     parser.add_argument("--space_bands", default=32, type=int)
@@ -61,6 +61,9 @@ def parse_args():
 
     if torch.cuda.is_available():
         accelerator = "gpu"
+        gpus = [args.gpu_device]
+    elif torch.backends.mps.is_available():
+        accelerator = "mps"
         gpus = [args.gpu_device]
     else:
         accelerator = "cpu"
