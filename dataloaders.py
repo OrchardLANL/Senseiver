@@ -10,7 +10,6 @@ from datasets import cylinder, NOAA, pipe, plume, porous
 
 from sensor_loc import ( cylinder_16_sensors, 
                          cylinder_8_sensors, 
-                         cylinder_4_sensors, 
                          cylinder_4BC_sensors,
                          sea_n_sensors,
                          sensors_3D
