@@ -67,7 +67,7 @@ Load a model to test or to re-train on. Our library saves the models sequenciall
 - `test`: bool.
 To test the model in the entire dataset.
 
-##Dependencies
+## Dependencies
 
 Create a conda environment named "senseiver" with all dependencies using "environment.yml" provided. Tested for cuda versions 11.8,12.1,12.3
 ```bash
