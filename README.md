@@ -72,7 +72,7 @@ To test the model in the entire dataset.
 ## Usage
 
 ```python
-python train.py --gpu 0 --data cylinder --num_sensors 4 --training_frames 50 --cons False --seed 123 --enc_preproc 16 --dec_num_latent_channels 16 --enc_num_latent_channels 16 --num_latents 256 --dec_preproc_ch 16 --test False 
+python train.py --gpu 0 --data cylinder --num_sensors 8 --training_frames 50 --cons False --seed 123 --enc_preproc 16 --dec_num_latent_channels 16 --enc_num_latent_channels 16 --num_latents 256 --dec_preproc_ch 16 --test False 
 ```
 
 
