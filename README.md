@@ -89,6 +89,9 @@ done
 <img src="results.png" width="500px"></img>
 </p>
 
+## Dynamic Sensor Placement Enhances Generalization
+This study introduces a methodology that allows a model to reconstruct a field by optimizing sensor position through backpropagation, enhancing the model's capability to efficiently explore the spatial domain. The sensors location are trained alongside the parameters of the attention-based neural network: to perform this we developed a fully end-to-end differentiable framework and we call this strategy differentiable walk.
+The differentiable walk strategy efficiently exploits the training portion of the dataset, allowing the sensors to adjust their position during training. Allowing the neural network to optimize the locations itself make it gather an enhanced spatial awareness that reflects in an improvement of the field reconstruction performance. Moreover, we corrected our algorithm to prevent sensor movement into invalid domain areas.
 
 ## Code acknowledgements
 
