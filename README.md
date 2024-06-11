@@ -90,8 +90,12 @@ done
 </p>
 
 ## Dynamic Sensor Placement Enhances Generalization
-This study introduces a methodology that allows a model to reconstruct a field by optimizing sensor position through backpropagation, enhancing the model's capability to efficiently explore the spatial domain. The sensors location are trained alongside the parameters of the attention-based neural network: to perform this we developed a fully end-to-end differentiable framework and we call this strategy differentiable walk.
-The differentiable walk strategy efficiently exploits the training portion of the dataset, allowing the sensors to adjust their position during training. Allowing the neural network to optimize the locations itself make it gather an enhanced spatial awareness that reflects in an improvement of the field reconstruction performance. Moreover, we corrected our algorithm to prevent sensor movement into invalid domain areas.
+We introduce a novel training strategy for the Senseiver model, which reconstructs a field by optimizing sensor positions through backpropagation. This enhancement significantly improves the model's ability to efficiently explore and understand the spatial domain. We developed a fully end-to-end differentiable framework called the differentiable walk strategy. This approach allows sensor locations to be trained alongside the parameters of the attention-based neural network. The differentiable walk strategy exploits optimally the training portion of the dataset, enabling sensors to dynamically adjust their positions during training. This results in enhanced spatial awareness and improved field reconstruction performance. Our algorithm includes corrections to prevent sensors from moving into invalid domain areas. 
+
+Usage:
+```python
+python train_diff_walk.py --gpu 0 --data cylinder --num_sensors 4 --training_frames 50 --cons False --seed 123 --enc_preproc 16 --dec_num_latent_channels 16 --enc_num_latent_channels 16 --num_latents 256 --dec_preproc_ch 16 --test False 
+```
 
 ## Code acknowledgements
 
