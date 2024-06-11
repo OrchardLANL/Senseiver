@@ -100,19 +100,19 @@ If you use our code for your own research, we would be grateful if you cite our 
 ```
 @article{Senseiver,
 title = "Development of the Senseiver for efficient field reconstruction from sparse observations",
+author = "Santos, Javier E and Fox, Zachary R and Mohan, Arvind and O’Malley, Daniel and Viswanathan, Hari and Lubbers, Nicholas",
 journal = "Nat Mach Intell",
-author="Santos, Javier E and Fox, Zachary R and Mohan, Arvind and O’Malley, Daniel and Viswanathan, Hari and Lubbers, Nicholas",
 year = "2023",
-doi = "url = "https://link.springer.com/article/10.1007/s11242-021-01617-y",
+doi = "https://link.springer.com/article/10.1007/s11242-021-01617-y",
 url = "https://www.nature.com/articles/s42256-023-00746-x"
 }
 ```
 ```
-@article{DiffWalk,
-title={Journey over Destination: Dynamic Sensor Placement Enhances Generalization},
-author={Marcato, Agnese and Guiltinan, Eric and Viswanathan, Hari and O'Malley, Daniel and Lubbers, Nicholas and E. Santos, Javier},
-journal={Machine Learning: Science and Technology}
-year="2024",
+@article{DynamicSensorPlacement,
+title = "Journey over Destination: Dynamic Sensor Placement Enhances Generalization",
+author = "Marcato, Agnese and Guiltinan, Eric and Viswanathan, Hari and O'Malley, Daniel and Lubbers, Nicholas and E. Santos, Javier",
+journal = "Machine Learning: Science and Technology",
+year= "2024",
 doi = "https://iopscience.iop.org/article/10.1088/2632-2153/ad4e06"
 }
 
