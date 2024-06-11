@@ -98,7 +98,7 @@ python train_diff_walk.py --gpu 0 --data cylinder --num_sensors 4 --training_fra
 ```
 
 <p align="center">
-<img src="diff_walk.png" width="500px"></img>
+<img src="diff_walk.png"></img>
 </p>
 
 
