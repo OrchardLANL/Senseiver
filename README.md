@@ -97,6 +97,11 @@ Usage:
 python train_diff_walk.py --gpu 0 --data cylinder --num_sensors 4 --training_frames 50 --cons False --seed 123 --enc_preproc 16 --dec_num_latent_channels 16 --enc_num_latent_channels 16 --num_latents 256 --dec_preproc_ch 16 --test False 
 ```
 
+<p align="center">
+<img src="diff_walk.png" width="500px"></img>
+</p>
+
+
 ## Code acknowledgements
 
 We are grateful to the developers of the many software packages used throughout this project including, but not limited, to PyTorch, Numpy, Vedo, Matplotlib, PyTorch Lightning, and [krasserm's](https://github.com/krasserm/perceiver-io) implementation of the perceiver models.
