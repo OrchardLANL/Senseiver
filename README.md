@@ -72,7 +72,7 @@ To test the model in the entire dataset.
 ## Usage
 
 ```python
-python train.py --gpu 0 --data cylinder --num_sensors 4 --training_frames 50 --cons False --seed 123 --enc_preproc 16 --dec_num_latent_channels 16 --enc_num_latent_channels 16 --num_latents 256 --dec_preproc_ch 16 --test False 
+python train.py --gpu 0 --data cylinder --num_sensors 8 --training_frames 50 --cons False --seed 123 --enc_preproc 16 --dec_num_latent_channels 16 --enc_num_latent_channels 16 --num_latents 256 --dec_preproc_ch 16 --test False 
 ```
 
 
@@ -89,22 +89,45 @@ done
 <img src="results.png" width="500px"></img>
 </p>
 
+## Dynamic Sensor Placement Enhances Generalization
+We introduce a novel training strategy for the Senseiver model, which reconstructs a field by optimizing sensor positions through backpropagation. This enhancement significantly improves the model's ability to efficiently explore and understand the spatial domain. We developed a fully end-to-end differentiable framework called the differentiable walk strategy. This approach allows sensor locations to be trained alongside the parameters of the attention-based neural network. The differentiable walk strategy exploits optimally the training portion of the dataset, enabling sensors to dynamically adjust their positions during training. This results in enhanced spatial awareness and improved field reconstruction performance. Our algorithm includes corrections to prevent sensors from moving into invalid domain areas. 
+
+Usage:
+```python
+python train_diff_walk.py --gpu 0 --data cylinder --num_sensors 8 --training_frames 50 --cons False --seed 123 --enc_preproc 16 --dec_num_latent_channels 16 --enc_num_latent_channels 16 --num_latents 256 --dec_preproc_ch 16 --test False 
+```
+
+<p align="center">
+<img src="diff_walk.png"></img>
+</p>
+
 
 ## Code acknowledgements
 
 We are grateful to the developers of the many software packages used throughout this project including, but not limited, to PyTorch, Numpy, Vedo, Matplotlib, PyTorch Lightning, and [krasserm's](https://github.com/krasserm/perceiver-io) implementation of the perceiver models.
 
-## Citation
-If you use our code for your own research, we would be grateful if you cite our publication
-[NMI](https://www.nature.com/articles/s42256-023-00746-x)
+## Citations
+If you use our code for your own research, we would be grateful if you cite our publications 
+[NMI](https://www.nature.com/articles/s42256-023-00746-x), [MLST](https://iopscience.iop.org/article/10.1088/2632-2153/ad4e06/meta)
 ```
 @article{Senseiver,
 title = "Development of the Senseiver for efficient field reconstruction from sparse observations",
+author = "Santos, Javier E and Fox, Zachary R and Mohan, Arvind and O’Malley, Daniel and Viswanathan, Hari and Lubbers, Nicholas",
 journal = "Nat Mach Intell",
 year = "2023",
-doi = "url = "https://link.springer.com/article/10.1007/s11242-021-01617-y",
+doi = "https://link.springer.com/article/10.1007/s11242-021-01617-y",
 url = "https://www.nature.com/articles/s42256-023-00746-x"
 }
+```
+```
+@article{DynamicSensorPlacement,
+title = "Journey over Destination: Dynamic Sensor Placement Enhances Generalization",
+author = "Marcato, Agnese and Guiltinan, Eric and Viswanathan, Hari and O'Malley, Daniel and Lubbers, Nicholas and E. Santos, Javier",
+journal = "Machine Learning: Science and Technology",
+year= "2024",
+doi = "https://iopscience.iop.org/article/10.1088/2632-2153/ad4e06"
+}
+
 ```
 
 
