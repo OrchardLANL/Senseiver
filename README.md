@@ -94,7 +94,7 @@ done
 
 We are grateful to the developers of the many software packages used throughout this project including, but not limited, to PyTorch, Numpy, Vedo, Matplotlib, PyTorch Lightning, and [krasserm's](https://github.com/krasserm/perceiver-io) implementation of the perceiver models.
 
-## Citation
+## Citations
 If you use our code for your own research, we would be grateful if you cite our publications 
 [NMI](https://www.nature.com/articles/s42256-023-00746-x), [MLST](https://iopscience.iop.org/article/10.1088/2632-2153/ad4e06/meta)
 ```
