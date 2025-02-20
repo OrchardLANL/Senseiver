@@ -36,4 +36,19 @@ def SWETsunamiWdiv(fname):
         return wave_height, latitude, longitude, ocn_floor, divu, mask, time_idx
     else:
         return wave_height, latitude, longitude, ocn_floor, divu, mask
+
+
+def SWETsunamiForPlotting2(fname):
+    fpath = "/Users/emcdugald/sparse_sens_tsunami/Data/tsunami/"+fname
+    data = sio.loadmat(fpath)
+    wave_height = data['zt']
+    max_wave_height = np.max(np.abs(wave_height))
+    wave_height /= max_wave_height
+    longitude = data['longitude'][0]
+    latitude = data['latitude'][0]
+    mask = data['ismask'][0]
+    times = data['data_times']
+    sensors = data['sensor_locs']
+    div = data['du']
+    return wave_height, latitude, longitude, mask, max_wave_height, times, sensors, div
     
