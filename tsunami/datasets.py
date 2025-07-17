@@ -39,7 +39,7 @@ def SWETsunamiWdiv(fname):
 
 
 def SWETsunamiForPlotting2(fname):
-    fpath = "/Users/emcdugald/sparse_sens_tsunami/Data/tsunami/"+fname
+    fpath = os.getcwd()+"/Data/tsunami/"+fname
     data = sio.loadmat(fpath)
     wave_height = data['zt']
     max_wave_height = np.max(np.abs(wave_height))
