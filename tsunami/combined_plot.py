@@ -6,36 +6,48 @@ import matplotlib.pyplot as plt
 import os
 import scipy.io as sio
 import numpy as np
-from matplotlib.ticker import FormatStrFormatter
-plt.rcParams['text.usetex'] = True
-plt.rcParams["font.family"] = "serif"
-plt.rcParams["font.size"]=16
-plt.rcParams['xtick.labelsize']=16
-plt.rcParams['ytick.labelsize']=16
+from scipy.signal import medfilt
 plt.rcParams['text.latex.preamble'] = r'\usepackage{bm}'
 
+plt.rcParams['text.usetex'] = True
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.size"] = 16
+plt.rcParams['xtick.labelsize'] = 16
+plt.rcParams['ytick.labelsize'] = 16
+plt.rcParams['font.weight'] = 'bold'
+plt.rcParams['axes.titlesize'] = 16
+plt.rcParams['figure.titlesize'] = 16
+plt.rcParams['axes.labelsize'] = 16
+plt.rcParams['font.weight'] = 'bold'
+plt.rcParams['axes.labelweight'] = 'bold'
+plt.rcParams['axes.titleweight'] = 'bold'
+
+
+
 def training_lons():
-    return np.array([136.6180, 139.5560, 139.3290, 138.9350, 140.9290, 135.7400, 141.5010, 142.3870])
+    return np.array([136.6180, 137.9440, 141.4890, 141.7020,
+                     142.2410, 142.4220, 143.0040,
+                     143.3780, 143.4350, 143.8990,
+                     136.8940])
 
 def training_lats():
-    return np.array([33.0700, 28.8560, 28.9320, 29.3840, 33.4530, 33.1570, 35.9360, 35.2670])
-
-def unseen_lons():
-    return np.array([136.6500, 140.2000, 138.9000, 139.5000])
-
-def unseen_lats():
-    return np.array([33.1000, 29.1000, 28.1000, 28.8000])
+    return np.array([33.0700, 33.1670, 34.5520, 36.1940,
+                     37.1470, 40.5910, 38.6600,
+                     40.1760, 40.8600, 42.0840,
+                     33.6830])
 
 
 def unseen_lons_new():
-    return np.array([136.6500,138.2000,138.9000,
-                     139.5000,140.2000,140.5000,
-                     141.5000,142.5000])
+    return np.array([140.8270, 141.4590, 142.0500, 142.5420,
+                     143.2280, 144.0600, 142.6190,
+                     143.4160,135.9050,137.0710,
+                     138.0250])
 
 def unseen_lats_new():
-    return np.array([33.1000,31.0000,28.1000,
-                     28.8000,29.1000,31.8000,
-                     34.2000,36.2000])
+    return np.array([33.3620, 36.5340, 41.0190, 34.7450,
+                     39.8690, 40.2320, 37.8120,
+                     41.4150, 33.1230, 33.1840,
+                     34.1750])
 
 
 
@@ -52,7 +64,7 @@ def plot_err_for_each_epi(means, times, dta_type, path, plot_pts):
 
     j=0
     for i in range(1, len(time_idxs)):
-        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7.2,6))
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7, 4.5))
         emean = means[int(time_idxs[i - 1]):int(time_idxs[i])]
         epi_lon = lons[j]
         epi_lat = lats[j]
@@ -62,12 +74,9 @@ def plot_err_for_each_epi(means, times, dta_type, path, plot_pts):
             plot_points = pts[(pts > start_plt_pts) & (pts < end_plt_pts)] - start_plt_pts
             ax.plot(emean)
             ax.scatter(plot_points*(5./6.), torch.tensor(emean)[plot_points], c='r', marker='o', s=5)
-            ax.title.set_text(f'Average Error = {torch.tensor(emean).mean():0.3}')
-            #ax.set(xlabel=r"\textbf{Time Steps}", ylabel="$\mathbf{|true-pred|/\max(|true|)}$")
-
-            ax.set_xlabel(r"\textbf{Time Steps}")
-            ax.set_ylabel(r"$\mathbf{\frac{|h-\hat{h}|}{\max(|h|)}}$", rotation='horizontal',
-                          horizontalalignment='right', verticalalignment='center',fontsize=16)
+            txt = r'\textbf{Average Error = }' + r'\textbf{' + str(
+                round(torch.tensor(emean).mean().item(), 3)) + r'}'
+            ax.set(xlabel=r"\textbf{Time Steps}", ylabel=txt)
 
 
             ax.legend(['all data', 'training data', '.10 threshold', '.05 threshold'])
@@ -85,37 +94,33 @@ def plot_err_for_each_epi(means, times, dta_type, path, plot_pts):
             else:
                 lt_idx = None  # If no such index exists
 
-            text = r'\textbf{Average Error = }' + r'\textbf{'+str(round(torch.tensor(emean).mean().item(),3)) + r'}'
-            ax.title.set_text(text)
-            # ax.title.set_text(f'Average Error = {torch.tensor(emean).mean():0.3}')
-            ax.scatter(plot_pts[90],emean[90],s=75,marker="x",color='r')
-            ax.scatter(plot_pts[180], emean[180], s=75, marker="x", color='r')
-            ax.scatter(plot_pts[270], emean[270], s=75, marker="x", color='r')
-            ax.scatter(plot_pts[lt_idx], emean[lt_idx], s=75, marker="x", color='g')
+            text = r'\textbf{Average Error = }' + r'\textbf{' + str(
+                round(torch.tensor(emean).mean().item(), 3)) + r'}'
+            ax.scatter(plot_pts[90],emean[90],s=300,marker="x",color='r')
+            ax.scatter(plot_pts[180], emean[180], s=300, marker="x", color='r')
+            ax.scatter(plot_pts[270], emean[270], s=300, marker="x", color='r')
+            ax.scatter(plot_pts[lt_idx], emean[lt_idx], s=300, marker="x", color='g')
             ax.set_xlim(0,240)
             ax.set_ylim(0,np.max(emean))
-            # ax.set(xlabel="Time (minutes)", ylabel=r"$\frac{|h-\hat{h}|}{\max(|h|)}$")
-            # ax.legend(['_',
-            #            r'Error at $75$ mins: ${}$'.format(round(emean[90],3)),
-            #            r'Error at $150$ mins: ${}$'.format(round(emean[180],3)),
-            #            r'Error at 225 mins: ${}$'.format(round(emean[270],3)),
-            #           r'$10\%$ threshold time: ${}$ mins'.format(round(plot_pts[lt_idx],1))])
-            #ax.set(xlabel=r"\textbf{Time (minutes)}", ylabel=r"$\mathbf{\frac{|h-\hat{h}|}{\max(|h|)}}$")
             ax.set_xlabel(r"\textbf{Time (minutes)}")
-            ax.set_ylabel(r"$\mathbf{\frac{|h-\hat{h}|}{\max(|h|)}}$", rotation='horizontal',
-                          horizontalalignment='right', verticalalignment='center',fontsize=16)
-
-            ax.legend(['_',
-                       r'\textbf{Error at $75$ mins: ' + r'\textbf{' + str(round(emean[90],3)) + r'}',
-                       r'\textbf{Error at $150$ mins: ' + r'\textbf{' + str(round(emean[180], 3)) + r'}',
-                       r'\textbf{Error at $225$ mins: ' + r'\textbf{' + str(round(emean[270], 3)) + r'}',
-                       r'\textbf{$10\%$ threshold time: }' + r'\textbf{' +str(round(plot_pts[lt_idx], 1)) + r'}' + r'\textbf{ mins}'])
+            ax.set_ylabel(text)
+            labels = [
+                '_',
+                r'\textbf{Error at }$\mathbf{75}$\textbf{ mins: }$\mathbf{' + str(round(emean[90], 3)) + '}$',
+                r'\textbf{Error at }$\mathbf{150}$\textbf{ mins: }$\mathbf{' + str(round(emean[180], 3)) + '}$',
+                r'\textbf{Error at }$\mathbf{225}$\textbf{ mins: }$\mathbf{' + str(round(emean[270], 3)) + '}$',
+                r'\textbf{10\% threshold time: }$\mathbf{' + str(round(plot_pts[lt_idx], 1)) + r'}$\textbf{ mins}'
+            ]
+            ax.legend(labels)
+            for label in ax.get_xticklabels() + ax.get_yticklabels():
+                label.set_fontweight('bold')
         j += 1
 
 
         plt.tight_layout()
         if path:
             plt.savefig(path + '/all_ts_{}'.format(dta_type)+"_epi_{}_{}".format(epi_lon,epi_lat)+"_new.png",dpi=400,bbox_inches='tight')
+
             plt.close()
 
 
@@ -136,10 +141,10 @@ def plot_timeseries_for_each_epi_unstruct(true,pred,times,sens_idxs,sens_locs,dt
         for idx in sens_idxs[0]:
             true_ts = true[int(time_idxs[i - 1]):int(time_idxs[i]), idx]
             pred_ts = pred[int(time_idxs[i - 1]):int(time_idxs[i]), idx]
-            if np.abs(true_ts).max() >= 5e-2:
+            if np.abs(true_ts).max() >= 3e-2:
                 times = np.arange(0,len(true_ts),1)*(5/6)
                 times = times
-                fig, ax = plt.subplots(figsize=(7.2,6))
+                fig, ax = plt.subplots(figsize=(7, 4.5))
                 ax.plot(times,true_ts, c='g')
                 ax.plot(times,pred_ts, c='k')
 
@@ -147,22 +152,82 @@ def plot_timeseries_for_each_epi_unstruct(true,pred,times,sens_idxs,sens_locs,dt
                 lat_deg = sens_locs[j][1] * 180 / np.pi
                 ax.set_xlim(0, 240)
 
-                # ax.title.set_text('Wave Height Time Series at sensor ({}$^\circ$E, {}$^\circ$N)'.format(round(lon_deg,1), round(lat_deg,1)))
-                # ax.set(xlabel="Time (minutes)", ylabel="Wave Height (m)")
-                # ax.legend(['True Height', 'Predicted Height'])
-                txt = r'\textbf{Wave Height at Sensor (}' + r'\textbf{' + str(
+                txt = r"\textbf{Height (m) at}" + r'\textbf{ (}' + r'\textbf{' + str(
                     round(lon_deg, 1)) + r'}' + r'\textbf{$^\circ$E, }' + r'\textbf{' + str(
                     round(lat_deg, 1)) + r'}' + r'\textbf{$^\circ$N)}'
-                # txt = r'\textbf{Wave Height Time Series at Sensor (}' + r'\textbf{' + str(round(lon_deg,1))+r'}' + r'\textbf{$^\circ$E}, '
-                # + r'\textbf{'+str(round(lat_deg,1))+r'}'+r'\textbf{$^\circ$N)}'
-                ax.title.set_text(txt)
-                ax.set(xlabel=r"\textbf{Time (minutes)}", ylabel=r"\textbf{Wave Height (m)}")
+                ax.set(xlabel=r"\textbf{Time (minutes)}", ylabel=txt)
                 ax.legend([r'\textbf{True Height}', r'\textbf{Predicted Height}'])
+                for label in ax.get_xticklabels() + ax.get_yticklabels():
+                    label.set_fontweight('bold')
+
+                plt.tight_layout()
+                plt.savefig(path + 'timeseries/{}'.format(dta_type)
+                            + "/sens_{}_{}_epi_{}_{}".format(round(lon_deg, 3), round(lat_deg, 3),
+                                                             round(lons[i - 1], 3), round(lats[i - 1], 3)) + "_new.png",
+                            dpi=400, bbox_inches='tight')
+                plt.close()
+
+                fig, ax = plt.subplots(figsize=(7, 4.5))
+                pred_ts_filtered = medfilt(pred_ts, 9)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 3)
+                ax.plot(times, true_ts, c='g')
+                ax.plot(times, pred_ts_filtered, c='k')
+
+                lon_deg = sens_locs[j][0] * 180 / np.pi
+                lat_deg = sens_locs[j][1] * 180 / np.pi
+                ax.set_xlim(0, 240)
+
+                txt = r"\textbf{Height (m) at}" + r'\textbf{ (}' + r'\textbf{' + str(
+                    round(lon_deg, 1)) + r'}' + r'\textbf{$^\circ$E, }' + r'\textbf{' + str(
+                    round(lat_deg, 1)) + r'}' + r'\textbf{$^\circ$N)}'
+                ax.set(xlabel=r"\textbf{Time (minutes)}", ylabel=txt)
+                ax.legend([r'\textbf{True Height}', r'\textbf{Predicted Height}'])
+                for label in ax.get_xticklabels() + ax.get_yticklabels():
+                    label.set_fontweight('bold')
 
                 plt.tight_layout()
 
                 plt.savefig(path + 'timeseries/{}'.format(dta_type)
-                + "/sens_{}_{}_epi_{}_{}".format(round(lon_deg,3),round(lat_deg,3),round(lons[i-1],3),round(lats[i-1],3)) + "_new.png",dpi=400,bbox_inches='tight')
+                            + "/sens_{}_{}_epi_{}_{}".format(round(lon_deg, 3), round(lat_deg, 3),
+                                                             round(lons[i - 1], 3),
+                                                             round(lats[i - 1], 3)) + "_filtered_v2.png",
+                            dpi=400, bbox_inches='tight')
+                plt.close()
+
+                ######################################
+
+                fig, ax = plt.subplots(figsize=(7, 4.5))
+                pred_ts_filtered = medfilt(pred_ts,21)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 19)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 17)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 15)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 13)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 11)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 9)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 7)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 5)
+                pred_ts_filtered = medfilt(pred_ts_filtered, 3)
+                ax.plot(times, true_ts, c='g')
+                ax.plot(times, pred_ts_filtered, c='k')
+
+                lon_deg = sens_locs[j][0] * 180 / np.pi
+                lat_deg = sens_locs[j][1] * 180 / np.pi
+                ax.set_xlim(0, 240)
+
+                txt = r"\textbf{Height (m) at}" + r'\textbf{ (}' + r'\textbf{' + str(
+                    round(lon_deg, 1)) + r'}' + r'\textbf{$^\circ$E, }' + r'\textbf{' + str(
+                    round(lat_deg, 1)) + r'}' + r'\textbf{$^\circ$N)}'
+                ax.set(xlabel=r"\textbf{Time (minutes)}", ylabel=txt)
+                ax.legend([r'\textbf{True Height}', r'\textbf{Predicted Height}'])
+                for label in ax.get_xticklabels() + ax.get_yticklabels():
+                    label.set_fontweight('bold')
+
+                plt.tight_layout()
+                plt.savefig(path + 'timeseries/{}'.format(dta_type)
+                            + "/sens_{}_{}_epi_{}_{}".format(round(lon_deg, 3), round(lat_deg, 3),
+                                                             round(lons[i - 1], 3),
+                                                             round(lats[i - 1], 3)) + "_filtered.png",
+                            dpi=400, bbox_inches='tight')
                 plt.close()
 
             j += 1
@@ -184,7 +249,7 @@ def plot_div_err_for_each_epi(means, swemeans, times, dta_type, path):
 
     j=0
     for i in range(1, len(time_idxs)):
-        fig, ax = plt.subplots(nrows=1, ncols=1,figsize=(7.2,6))
+        fig, ax = plt.subplots(nrows=1, ncols=1,figsize=(8.5,4.5))
         emean = means[int(time_idxs[i - 1])+8:int(time_idxs[i])]
         swe_emean = swemeans[int(time_idxs[i - 1])+8:int(time_idxs[i])]
         times = np.arange(0,len(emean),1)*(5/6)
@@ -193,16 +258,9 @@ def plot_div_err_for_each_epi(means, swemeans, times, dta_type, path):
         epi_lat = lats[j]
         ax.plot(times, emean, c='g')
         ax.plot(times, swe_emean, c='k')
-        # ax.title.set_text(f'Average $h_t$ error = {torch.tensor(emean).mean():0.3}')
-        # ax.set(xlabel="Time (minutes)", ylabel=r"$\frac{|h_t-\hat{h_t}|}{\max(|h|)}$")
-        # ax.legend(['Senseiver Error', 'SWE Error'])
-        txt = r'\textbf{Average }' +r'$\mathbf{h_t}$' + r'\textbf{ Error = }' + r'\textbf{'+str(round(torch.tensor(emean).mean().item(),3)) + r'}'
-        ax.title.set_text(txt)
-        #ax.set(xlabel=r"\textbf{Time (minutes)}", ylabel=r"$\mathbf{\frac{|h_t-\hat{h_t}|}{\max(|h|)}}$")
+        txt = r'\textbf{Average Error = }' + r'\textbf{'+str(round(torch.tensor(emean).mean().item(),3)) + r'}'
         ax.set_xlabel(r"\textbf{Time (minutes)}")
-        ax.set_ylabel(r"$\mathbf{\frac{|h_t-\hat{h_t}|}{\max(|h|)}}$",
-                      rotation='horizontal', horizontalalignment='right',
-                      verticalalignment='center',fontsize=16)
+        ax.set_ylabel(txt)
         ax.legend([r'\textbf{Senseiver Error}', r'\textbf{SWE Error}'])
         ax.set_xlim(0,240)
 
@@ -210,6 +268,7 @@ def plot_div_err_for_each_epi(means, swemeans, times, dta_type, path):
         plt.tight_layout()
         if path:
             plt.savefig(path + '/all_ts_div_err_{}'.format(dta_type)+"_epi_{}_{}".format(epi_lon,epi_lat)+"_new.png",dpi=400,bbox_inches='tight')
+
             plt.close()
 
 def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname, data_type,path=None):
@@ -229,7 +288,7 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         true_masked_4hr = torch.where((full_mask_4hr == 0), true4hr[..., 0], 0)
         pred_masked_4hr = torch.where((full_mask_4hr == 0), pred4hr[..., 0], 0)
         intervals_2hr = [(0, 145), (145, 290), (290, 435), (435, 580), (580, 725), (725, 870), (870, 1015),
-                         (1015, 1160)]
+                         (1015, 1160), (1160, 1305), (1305, 1450), (1450, 1595)]
         sim1_2hr = true_masked_2hr[intervals_2hr[0][0]:intervals_2hr[0][1]]
         sim2_2hr = true_masked_2hr[intervals_2hr[1][0]:intervals_2hr[1][1]]
         sim3_2hr = true_masked_2hr[intervals_2hr[2][0]:intervals_2hr[2][1]]
@@ -238,8 +297,11 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sim6_2hr = true_masked_2hr[intervals_2hr[5][0]:intervals_2hr[5][1]]
         sim7_2hr = true_masked_2hr[intervals_2hr[6][0]:intervals_2hr[6][1]]
         sim8_2hr = true_masked_2hr[intervals_2hr[7][0]:intervals_2hr[7][1]]
+        sim9_2hr = true_masked_2hr[intervals_2hr[8][0]:intervals_2hr[8][1]]
+        sim10_2hr = true_masked_2hr[intervals_2hr[9][0]:intervals_2hr[9][1]]
+        sim11_2hr = true_masked_2hr[intervals_2hr[10][0]:intervals_2hr[10][1]]
         intervals_4hr = [(0, 144), (144, 288), (288, 432), (432, 576), (576, 720), (720, 864), (864, 1008),
-                         (1008, 1152)]
+                         (1008, 1152), (1152, 1296), (1296, 1440), (1440, 1584)]
         sim1_4hr = true_masked_4hr[intervals_4hr[0][0]:intervals_4hr[0][1]]
         sim2_4hr = true_masked_4hr[intervals_4hr[1][0]:intervals_4hr[1][1]]
         sim3_4hr = true_masked_4hr[intervals_4hr[2][0]:intervals_4hr[2][1]]
@@ -248,6 +310,9 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sim6_4hr = true_masked_4hr[intervals_4hr[5][0]:intervals_4hr[5][1]]
         sim7_4hr = true_masked_4hr[intervals_4hr[6][0]:intervals_4hr[6][1]]
         sim8_4hr = true_masked_4hr[intervals_4hr[7][0]:intervals_4hr[7][1]]
+        sim9_4hr = true_masked_4hr[intervals_4hr[8][0]:intervals_4hr[8][1]]
+        sim10_4hr = true_masked_4hr[intervals_4hr[9][0]:intervals_4hr[9][1]]
+        sim11_4hr = true_masked_4hr[intervals_4hr[10][0]:intervals_4hr[10][1]]
         sim1_full = np.concatenate((sim1_2hr, sim1_4hr), axis=0)
         sim2_full = np.concatenate((sim2_2hr, sim2_4hr), axis=0)
         sim3_full = np.concatenate((sim3_2hr, sim3_4hr), axis=0)
@@ -256,8 +321,12 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sim6_full = np.concatenate((sim6_2hr, sim6_4hr), axis=0)
         sim7_full = np.concatenate((sim7_2hr, sim7_4hr), axis=0)
         sim8_full = np.concatenate((sim8_2hr, sim8_4hr), axis=0)
+        sim9_full = np.concatenate((sim9_2hr, sim9_4hr), axis=0)
+        sim10_full = np.concatenate((sim10_2hr, sim10_4hr), axis=0)
+        sim11_full = np.concatenate((sim11_2hr, sim11_4hr), axis=0)
         true_masked = np.concatenate((sim1_full,sim2_full,sim3_full,sim4_full,
-                                      sim5_full,sim6_full,sim7_full,sim8_full),axis=0)
+                                      sim5_full,sim6_full,sim7_full,sim8_full,
+                                      sim9_full, sim10_full, sim11_full),axis=0)
 
         sens1_2hr = pred_masked_2hr[intervals_2hr[0][0]:intervals_2hr[0][1]]
         sens2_2hr = pred_masked_2hr[intervals_2hr[1][0]:intervals_2hr[1][1]]
@@ -267,6 +336,9 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sens6_2hr = pred_masked_2hr[intervals_2hr[5][0]:intervals_2hr[5][1]]
         sens7_2hr = pred_masked_2hr[intervals_2hr[6][0]:intervals_2hr[6][1]]
         sens8_2hr = pred_masked_2hr[intervals_2hr[7][0]:intervals_2hr[7][1]]
+        sens9_2hr = pred_masked_2hr[intervals_2hr[8][0]:intervals_2hr[8][1]]
+        sens10_2hr = pred_masked_2hr[intervals_2hr[9][0]:intervals_2hr[9][1]]
+        sens11_2hr = pred_masked_2hr[intervals_2hr[10][0]:intervals_2hr[10][1]]
         sens1_4hr = pred_masked_4hr[intervals_4hr[0][0]:intervals_4hr[0][1]]
         sens2_4hr = pred_masked_4hr[intervals_4hr[1][0]:intervals_4hr[1][1]]
         sens3_4hr = pred_masked_4hr[intervals_4hr[2][0]:intervals_4hr[2][1]]
@@ -275,6 +347,9 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sens6_4hr = pred_masked_4hr[intervals_4hr[5][0]:intervals_4hr[5][1]]
         sens7_4hr = pred_masked_4hr[intervals_4hr[6][0]:intervals_4hr[6][1]]
         sens8_4hr = pred_masked_4hr[intervals_4hr[7][0]:intervals_4hr[7][1]]
+        sens9_4hr = pred_masked_4hr[intervals_4hr[8][0]:intervals_4hr[8][1]]
+        sens10_4hr = pred_masked_4hr[intervals_4hr[9][0]:intervals_4hr[9][1]]
+        sens11_4hr = pred_masked_4hr[intervals_4hr[10][0]:intervals_4hr[10][1]]
         sens1_full = np.concatenate((sens1_2hr, sens1_4hr), axis=0)
         sens2_full = np.concatenate((sens2_2hr, sens2_4hr), axis=0)
         sens3_full = np.concatenate((sens3_2hr, sens3_4hr), axis=0)
@@ -283,8 +358,12 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sens6_full = np.concatenate((sens6_2hr, sens6_4hr), axis=0)
         sens7_full = np.concatenate((sens7_2hr, sens7_4hr), axis=0)
         sens8_full = np.concatenate((sens8_2hr, sens8_4hr), axis=0)
+        sens9_full = np.concatenate((sens9_2hr, sens9_4hr), axis=0)
+        sens10_full = np.concatenate((sens10_2hr, sens10_4hr), axis=0)
+        sens11_full = np.concatenate((sens11_2hr, sens11_4hr), axis=0)
         pred_masked = np.concatenate((sens1_full,sens2_full,sens3_full,sens4_full,
-                                      sens5_full,sens6_full,sens7_full,sens8_full),axis=0)
+                                      sens5_full,sens6_full,sens7_full,sens8_full,
+                                      sens9_full, sens10_full, sens11_full),axis=0)
 
 
         maxes = [np.abs(true_masked[i, :]).max() for i in range(len(true_masked))]
@@ -294,7 +373,7 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         ratios = [(abs_errs[i] / maxes[i]) for i in range(len(abs_errs))]
         emean = [ratios[i].flatten()[np.where(np.abs(true_masked[i].flatten()) > 1e-4)].mean().item() for i in range(len(abs_errs))]
 
-        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(14,6))
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7,3))
         plot_points_2hr = dataloader1.dataset.train_ind
         plot_points_4hr = dataloader2.dataset.train_ind
         plot_points_4hr = plot_points_4hr + 1160
@@ -311,40 +390,30 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
 
             text = r'\textbf{Average Error = }' + r'\textbf{' + str(round(torch.tensor(emean).mean().item(), 3)) + r'}'
             ax.title.set_text(text)
-            #ax.set(xlabel=r"\textbf{Frame Index}", ylabel=r"$\mathbf{\frac{|h-\hat{h}|}{\max(|h|)}}$")
             ax.set_xlabel(r"\textbf{Frame Index}")
             ax.set_ylabel(r"$\mathbf{\frac{|h-\hat{h}|}{\max(|h|)}}$", rotation='horizontal',
-                          horizontalalignment='right', verticalalignment='center',fontsoze=16)
+                          horizontalalignment='right', verticalalignment='center')
 
 
             ax.vlines(frame_ids, 0, np.max(emean), color='g')
             ax.legend([r'\textbf{all data}', r'\textbf{training data}',r'\textbf{epi split}'])
-            # ax.title.set_text(f'$\epsilon$ = {torch.tensor(emean).nanmean():0.3}')
-            # ax.set(xlabel="Frame Index", ylabel=r"$\frac{|h-\hat{h}|}{\max(|h|)}$")
-            # ax.vlines(frame_ids, 0, np.max(emean), color='g')
-            # ax.legend(['all data', 'training data', 'epi split'])
 
         else:
             ax.plot(emean)
             text = r'\textbf{Average Error = }' + r'\textbf{' + str(round(torch.tensor(emean).mean().item(), 3)) + r'}'
             ax.title.set_text(text)
-            #ax.set(xlabel=r"\textbf{Frame Index}", ylabel=r"$\mathbf{\frac{|h-\hat{h}|}{\max(|h|)}}$")
-
             ax.set_xlabel(r"\textbf{Frame Index}")
-            ax.set_ylabel(r"$\mathbf{\frac{|h-\hat{h}|}{\max(|h|)}}$", rotation='horizontal',
-                          horizontalalignment='right', verticalalignment='center',fontsize=16)
+            ax.set_ylabel(text, rotation='horizontal',
+                          horizontalalignment='right', verticalalignment='center', fontsize=8)
 
 
             ax.vlines(frame_ids, 0, np.max(emean), color='g')
             ax.legend([r'\textbf{all data}', r'\textbf{epi split}'])
-            # ax.title.set_text(f'$\epsilon$ = {torch.tensor(emean).nanmean():0.3}')
-            # ax.set(xlabel="Frame Index", ylabel=r"$\frac{|h-\hat{h}|}{\max(|h|)}$")
-            # ax.vlines(frame_ids, 0, np.max(emean), color='g')
-            # ax.legend(['all data', 'epi split'])
 
         plt.tight_layout()
         if path:
-            plt.savefig(path + '/all_ts_{}'.format(data_type)+"_new.png")
+            #plt.savefig(path + '/all_ts_{}'.format(data_type)+"_new.pdf")
+            plt.savefig(path + '/all_ts_{}'.format(data_type) + "_new.png",dpi=400)
             plt.close()
 
         print(f'The mean mean err is {torch.tensor(emean).nanmean():0.3}')
@@ -368,7 +437,7 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
             pred_ts = pred_masked[:,idx]
 
             if np.abs(true_ts).max() >= 1e-1:
-                fig, ax = plt.subplots(figsize=(14,6))
+                fig, ax = plt.subplots(figsize=(7,3))
                 ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
 
                 ax.plot(true_ts,c='g')
@@ -377,20 +446,16 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
 
                 lon_deg = sensor_locs[j][1] * 180 / np.pi - 180
                 lat_deg = sensor_locs[j][0] * 180 / np.pi
-                txt = r'\textbf{Wave Height at Sensor (}' + r'\textbf{' + str(
+                txt = r'\textbf{Sensor (}' + r'\textbf{' + str(
                     round(lon_deg, 1)) + r'}' + r'\textbf{$^\circ$E, }' + r'\textbf{' + str(
                     round(lat_deg, 1)) + r'}' + r'\textbf{$^\circ$N)}'
                 ax.title.set_text(txt)
                 ax.set(xlabel=r"\textbf{Frame Index}", ylabel=r"\textbf{Normalized Wave Height (m)}")
                 ax.legend([r'\textbf{True Height}', r'\textbf{Predicted Height}', r'\textbf{Absolute Error}'])
-
-                # ax.title.set_text('Wave Height Time Series at {}, {}'.format(round(lon_deg), round(lat_deg)))
-                # ax.set(xlabel="Frame Index", ylabel="Normalized Wave Height (m)")
-                # ax.legend(['True Height', 'Predicted Height', 'Absolute Error'])
-
                 plt.tight_layout()
 
-                plt.savefig(path + 'timeseries/{}'.format(data_type)+"/sens_{}_{}_all_epis".format(round(lon_deg),round(lat_deg))+"_new.png")
+                plt.savefig(path + 'timeseries/{}'.format(data_type)+"/sens_{}_{}_all_epis".format(round(lon_deg),round(lat_deg))+"_new.png",dpi=400)
+
                 plt.close()
 
             j += 1
@@ -400,10 +465,10 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         ### PHYSICAL CONSISTENCY PLOTS ###
         n_sims = len(dataloader1.dataset.time_idx)
         train_ind_start = np.append(0, dataloader1.dataset.time_idx[0:n_sims - 1])
-        for i in range(8):
+        for i in range(11):
             train_ind_start[i] += 144*i
         combined_times = dataloader1.dataset.time_idx + dataloader2.dataset.time_idx
-        train_inds = torch.concatenate([torch.range(train_ind_start[i], combined_times[i] - 2) for i in range(8)])
+        train_inds = torch.concatenate([torch.range(train_ind_start[i], combined_times[i] - 2) for i in range(11)])
         curr_inds = torch.add(train_inds, 1).long()
         prev_inds = train_inds.long()
 
@@ -417,6 +482,9 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sim6div_2hr = truediv_2hr[intervals_2hr[5][0]:intervals_2hr[5][1]]
         sim7div_2hr = truediv_2hr[intervals_2hr[6][0]:intervals_2hr[6][1]]
         sim8div_2hr = truediv_2hr[intervals_2hr[7][0]:intervals_2hr[7][1]]
+        sim9div_2hr = truediv_2hr[intervals_2hr[8][0]:intervals_2hr[8][1]]
+        sim10div_2hr = truediv_2hr[intervals_2hr[9][0]:intervals_2hr[9][1]]
+        sim11div_2hr = truediv_2hr[intervals_2hr[10][0]:intervals_2hr[10][1]]
         sim1div_4hr = truediv_4hr[intervals_4hr[0][0]:intervals_4hr[0][1]]
         sim2div_4hr = truediv_4hr[intervals_4hr[1][0]:intervals_4hr[1][1]]
         sim3div_4hr = truediv_4hr[intervals_4hr[2][0]:intervals_4hr[2][1]]
@@ -425,6 +493,9 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sim6div_4hr = truediv_4hr[intervals_4hr[5][0]:intervals_4hr[5][1]]
         sim7div_4hr = truediv_4hr[intervals_4hr[6][0]:intervals_4hr[6][1]]
         sim8div_4hr = truediv_4hr[intervals_4hr[7][0]:intervals_4hr[7][1]]
+        sim9div_4hr = truediv_4hr[intervals_4hr[8][0]:intervals_4hr[8][1]]
+        sim10div_4hr = truediv_4hr[intervals_4hr[9][0]:intervals_4hr[9][1]]
+        sim11div_4hr = truediv_4hr[intervals_4hr[10][0]:intervals_4hr[10][1]]
         sim1div_full = np.concatenate((sim1div_2hr, sim1div_4hr), axis=0)
         sim2div_full = np.concatenate((sim2div_2hr, sim2div_4hr), axis=0)
         sim3div_full = np.concatenate((sim3div_2hr, sim3div_4hr), axis=0)
@@ -433,8 +504,12 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sim6div_full = np.concatenate((sim6div_2hr, sim6div_4hr), axis=0)
         sim7div_full = np.concatenate((sim7div_2hr, sim7div_4hr), axis=0)
         sim8div_full = np.concatenate((sim8div_2hr, sim8div_4hr), axis=0)
+        sim9div_full = np.concatenate((sim9div_2hr, sim9div_4hr), axis=0)
+        sim10div_full = np.concatenate((sim10div_2hr, sim10div_4hr), axis=0)
+        sim11div_full = np.concatenate((sim11div_2hr, sim11div_4hr), axis=0)
         true_div = np.concatenate((sim1div_full, sim2div_full, sim3div_full, sim4div_full,
-                                      sim5div_full, sim6div_full, sim7div_full, sim8div_full), axis=0)
+                                      sim5div_full, sim6div_full, sim7div_full, sim8div_full,
+                                   sim9div_full, sim10div_full, sim11div_full), axis=0)
 
         true2hr = dataloader1.dataset.data.to('cpu')
         true4hr = dataloader2.dataset.data.to('cpu')
@@ -448,6 +523,9 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sim6_2hr = true2hr[intervals_2hr[5][0]:intervals_2hr[5][1]]
         sim7_2hr = true2hr[intervals_2hr[6][0]:intervals_2hr[6][1]]
         sim8_2hr = true2hr[intervals_2hr[7][0]:intervals_2hr[7][1]]
+        sim9_2hr = true2hr[intervals_2hr[8][0]:intervals_2hr[8][1]]
+        sim10_2hr = true2hr[intervals_2hr[9][0]:intervals_2hr[9][1]]
+        sim11_2hr = true2hr[intervals_2hr[10][0]:intervals_2hr[10][1]]
         sim1_4hr = true4hr[intervals_4hr[0][0]:intervals_4hr[0][1]]
         sim2_4hr = true4hr[intervals_4hr[1][0]:intervals_4hr[1][1]]
         sim3_4hr = true4hr[intervals_4hr[2][0]:intervals_4hr[2][1]]
@@ -456,6 +534,9 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sim6_4hr = true4hr[intervals_4hr[5][0]:intervals_4hr[5][1]]
         sim7_4hr = true4hr[intervals_4hr[6][0]:intervals_4hr[6][1]]
         sim8_4hr = true4hr[intervals_4hr[7][0]:intervals_4hr[7][1]]
+        sim9_4hr = true4hr[intervals_4hr[8][0]:intervals_4hr[8][1]]
+        sim10_4hr = true4hr[intervals_4hr[9][0]:intervals_4hr[9][1]]
+        sim11_4hr = true4hr[intervals_4hr[10][0]:intervals_4hr[10][1]]
         sim1_full = np.concatenate((sim1_2hr, sim1_4hr), axis=0)
         sim2_full = np.concatenate((sim2_2hr, sim2_4hr), axis=0)
         sim3_full = np.concatenate((sim3_2hr, sim3_4hr), axis=0)
@@ -464,8 +545,12 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sim6_full = np.concatenate((sim6_2hr, sim6_4hr), axis=0)
         sim7_full = np.concatenate((sim7_2hr, sim7_4hr), axis=0)
         sim8_full = np.concatenate((sim8_2hr, sim8_4hr), axis=0)
+        sim9_full = np.concatenate((sim9_2hr, sim9_4hr), axis=0)
+        sim10_full = np.concatenate((sim10_2hr, sim10_4hr), axis=0)
+        sim11_full = np.concatenate((sim11_2hr, sim11_4hr), axis=0)
         true = np.concatenate((sim1_full, sim2_full, sim3_full, sim4_full,
-                                      sim5_full, sim6_full, sim7_full, sim8_full), axis=0)
+                                      sim5_full, sim6_full, sim7_full, sim8_full,
+                               sim9_full, sim10_full, sim11_full), axis=0)
         sens1_2hr = pred2hr[intervals_2hr[0][0]:intervals_2hr[0][1]]
         sens2_2hr = pred2hr[intervals_2hr[1][0]:intervals_2hr[1][1]]
         sens3_2hr = pred2hr[intervals_2hr[2][0]:intervals_2hr[2][1]]
@@ -474,6 +559,9 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sens6_2hr = pred2hr[intervals_2hr[5][0]:intervals_2hr[5][1]]
         sens7_2hr = pred2hr[intervals_2hr[6][0]:intervals_2hr[6][1]]
         sens8_2hr = pred2hr[intervals_2hr[7][0]:intervals_2hr[7][1]]
+        sens9_2hr = pred2hr[intervals_2hr[8][0]:intervals_2hr[8][1]]
+        sens10_2hr = pred2hr[intervals_2hr[9][0]:intervals_2hr[9][1]]
+        sens11_2hr = pred2hr[intervals_2hr[10][0]:intervals_2hr[10][1]]
         sens1_4hr = pred4hr[intervals_4hr[0][0]:intervals_4hr[0][1]]
         sens2_4hr = pred4hr[intervals_4hr[1][0]:intervals_4hr[1][1]]
         sens3_4hr = pred4hr[intervals_4hr[2][0]:intervals_4hr[2][1]]
@@ -482,6 +570,9 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sens6_4hr = pred4hr[intervals_4hr[5][0]:intervals_4hr[5][1]]
         sens7_4hr = pred4hr[intervals_4hr[6][0]:intervals_4hr[6][1]]
         sens8_4hr = pred4hr[intervals_4hr[7][0]:intervals_4hr[7][1]]
+        sens9_4hr = pred4hr[intervals_4hr[8][0]:intervals_4hr[8][1]]
+        sens10_4hr = pred4hr[intervals_4hr[9][0]:intervals_4hr[9][1]]
+        sens11_4hr = pred4hr[intervals_4hr[10][0]:intervals_4hr[10][1]]
         sens1_full = np.concatenate((sens1_2hr, sens1_4hr), axis=0)
         sens2_full = np.concatenate((sens2_2hr, sens2_4hr), axis=0)
         sens3_full = np.concatenate((sens3_2hr, sens3_4hr), axis=0)
@@ -490,8 +581,12 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         sens6_full = np.concatenate((sens6_2hr, sens6_4hr), axis=0)
         sens7_full = np.concatenate((sens7_2hr, sens7_4hr), axis=0)
         sens8_full = np.concatenate((sens8_2hr, sens8_4hr), axis=0)
+        sens9_full = np.concatenate((sens9_2hr, sens9_4hr), axis=0)
+        sens10_full = np.concatenate((sens10_2hr, sens10_4hr), axis=0)
+        sens11_full = np.concatenate((sens11_2hr, sens11_4hr), axis=0)
         pred = np.concatenate((sens1_full, sens2_full, sens3_full, sens4_full,
-                                      sens5_full, sens6_full, sens7_full, sens8_full), axis=0)
+                                      sens5_full, sens6_full, sens7_full, sens8_full,
+                               sens9_full, sens10_full, sens11_full), axis=0)
 
 
 
@@ -517,26 +612,21 @@ def plot_all_ts_tsu_japan_unstruct(dataloader1,dataloader2,pred1, pred2, matname
         swe_ratios = [(swe_abs_errs[i] / maxes[i]) for i in range(len(swe_abs_errs))]
         swe_emean = [swe_ratios[i].flatten()[torch.where(torch.from_numpy(true_masked[i]).flatten().abs() > 1e-4)].mean() for i in
                  range(len(abs_errs))]
-        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(14,6))
+        fig, ax = plt.subplots(nrows=1, ncols=1, figsize=(7,3))
         ax.ticklabel_format(axis='y', style='sci', scilimits=(0, 0))
         ax.plot(emean)
         ax.scatter(range(len(swe_emean)),swe_emean, c='r',s=.5)
         txt = r'\textbf{Average Error = }' + r'\textbf{' + str(round(torch.tensor(emean).mean().item(), 3)) + r'}'
         ax.title.set_text(txt)
-        #ax.set(xlabel=r"\textbf{Frame Index}", ylabel=r"$\mathbf{\frac{|h-\hat{h}|}{\max(|h|)}}$")
         ax.set_xlabel(r"\textbf{Frame Index}")
         ax.set_ylabel(r"$\mathbf{\frac{|h_t-\hat{h_t}|}{\max(|h_t|)}}$", rotation='horizontal',
-                      horizontalalignment='right', verticalalignment='center',fontsize=16)
+                      horizontalalignment='right', verticalalignment='center',fontsize=8)
         ax.vlines(frame_ids, 0, max(np.max(swe_emean),np.max(emean)), color='g')
         ax.legend([r'\textbf{Senseiver Err}', r'\textbf{SWE Err}', r'\textbf{epi split}'])
-        # ax.title.set_text(f'$\epsilon$ = {torch.tensor(emean).mean():0.3}')
-        # ax.set(xlabel="Frame Index", ylabel=r"$\frac{|h-\hat{h}|}{\max(|h|)}$")
-        # ax.vlines(frame_ids, 0, max(np.max(swe_emean), np.max(emean)), color='g')
-        # ax.legend(['Senseiver Err', 'SWE Err', 'epi split'])
 
         plt.tight_layout()
         if path:
-            plt.savefig(path + '/divergence_all_ts_{}'.format(data_type) + "_new.png")
+            plt.savefig(path + '/divergence_all_ts_{}'.format(data_type) + "_new.png",dpi=400)
             plt.close()
 
         print(f'The mean mean div err is {torch.tensor(emean).mean():0.3}')

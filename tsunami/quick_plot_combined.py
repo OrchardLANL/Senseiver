@@ -24,27 +24,17 @@ multiprocessing.set_start_method("fork")
 
 # load the simulation data and create a dataloader
 dataloader1 = senseiver_dataloader(data_config, num_workers=4)
-
 data_config2 = data_config
-data_config2['data_key'] = "unseen_agg_8_sims_0_time_ss_2_ss_unstruct_ntimes_3464_wd_new_epis_tf_289.mat"
+data_config2['data_key'] = "unseen_agg_11_sims_0_time_ss_2_ss_unstruct_ntimes_3179_wd_new_epis_v7_tf_289.mat"
 dataloader2 = senseiver_dataloader(data_config2, num_workers=4)
 
 
 model_num1 = encoder_config['load_model_num']
-if model_num1 == 34:
-    model_num2 = 22
-else:
-    model_num2 = 2
+model_num2 = 125 #use the checkpoint number corresponding to desired model
 
 
 print(f'Loading {model_num1} ...')
-
 model_loc1 = gb(f"lightning_logs/version_{model_num1}/checkpoints/*.ckpt")[0]
-# Use the below commented code if using on HPC
-# model = Senseiver.load_from_checkpoint(model_loc,
-#                                        **encoder_config,
-#                                        **decoder_config,
-#                                        **data_config)
 model1 = Senseiver.load_from_checkpoint(model_loc1, map_location=torch.device('cpu'),
                                        **encoder_config,
                                        **decoder_config,
@@ -53,11 +43,6 @@ model1 = Senseiver.load_from_checkpoint(model_loc1, map_location=torch.device('c
 print(f'Loading {model_num2} ...')
 
 model_loc2 = gb(f"lightning_logs/version_{model_num2}/checkpoints/*.ckpt")[0]
-# Use the below commented code if using on HPC
-# model = Senseiver.load_from_checkpoint(model_loc,
-#                                        **encoder_config,
-#                                        **decoder_config,
-#                                        **data_config)
 model2 = Senseiver.load_from_checkpoint(model_loc2, map_location=torch.device('cpu'),
                                         **encoder_config,
                                         **decoder_config,
@@ -76,10 +61,7 @@ with torch.no_grad():
         output_im1 = torch.load(os.getcwd() + "/lightning_logs/version_" + str(model_num1) + '/tensor' + '_training' + '.pt')
         output_im2 = torch.load(os.getcwd() + "/lightning_logs/version_" + str(model_num2) + '/tensor' + '_training' + '.pt')
 
-if encoder_config['load_model_num'] == 34:
-    path = "/Users/emcdugald/sparse_sens_tsunami/lightning_logs/combined_34_22/"
-else:
-    path = "/Users/emcdugald/sparse_sens_tsunami/lightning_logs/combined_0_2/"
+path = os.getcwd()+"/lightning_logs/combined_122_125"
 
 if unseen_flag:
     name = 'tensor_unseen.pt'
